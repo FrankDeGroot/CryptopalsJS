@@ -6,7 +6,6 @@ var cryptBytes = function () {
   }
   return bytes;
 }();
-//console.log(bytes);
 function decrypt(cryptBytes, key) {
   var plainBytes = [];
   for(var i = 0; i < cryptBytes.length; i++) {
@@ -14,38 +13,50 @@ function decrypt(cryptBytes, key) {
   }
   return plainBytes;
 }
-function count(plainBytes, char) {
-  var count = 0;
+function decode(plainBytes) {
+  var plaintext = '';
   for(var i = 0; i < plainBytes.length; i++) {
-    if (String.fromCharCode(plainBytes[i]).toUpperCase() === char) {
+    plaintext += String.fromCharCode(plainBytes[i]);
+  }
+  return plaintext;
+}
+function countText(plaintext) {
+  var count = 0;
+  for(var i = 0; i < plaintext.length; i++) {
+    if(plaintext[i].match(/[A-Za-z ]/)) {
       count++;
     }
   }
   return count;
 }
-function decode(plainBytes) {
-  var text = '';
-  for(var i = 0; i < plainBytes.length; i++) {
-    text += String.fromCharCode(plainBytes[i]);
+function count(plaintext, char) {
+  var count = 0;
+  for(var i = 0; i < plaintext.length; i++) {
+    if (plaintext[i].toUpperCase() === char) {
+      count++;
+    }
   }
-  return text;
+  return count;
 }
-function frequencies(plainBytes) {
+function frequencies(plaintext) {
   var topUsed = "ETAOINSHRDLU",
   frequencies = {},
   char = '';
   for(var i = 0; i < topUsed.length; i++) {
     char = topUsed[i];
-    frequencies[char] = count(plainBytes, char);
+    frequencies[char] = count(plaintext, char);
   }
   return frequencies;
 }
-var counts = [];
-for (var key = 0; key < 256; key++) {
-  var plainBytes = decrypt(cryptBytes, key);
-  counts.push({ key: key, frequencies: frequencies(plainBytes), plaintext: decode(plainBytes)});
+function crack() {
+  var counts = [];
+  for (var key = 0; key < 256; key++) {
+    var plaintext = decode(decrypt(cryptBytes, key));
+    counts.push({ key: key, text: countText(plaintext), frequencies: frequencies(plaintext), plaintext: plaintext});
+  }
+  counts.sort(function (a, b) {
+    return b.text - a.text;
+  });
+  console.log(counts.slice(0, 2));
 }
-counts.sort(function (a, b) {
-  return b.frequencies.E - a.frequencies.E;
-});
-console.log(counts.slice(0, 15));
+crack();
