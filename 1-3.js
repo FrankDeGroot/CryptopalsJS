@@ -17,7 +17,7 @@ function decrypt(cryptBytes, key) {
 function count(plainBytes, char) {
   var count = 0;
   for(var i = 0; i < plainBytes.length; i++) {
-    if (plainBytes[i] === char) {
+    if (String.fromCharCode(plainBytes[i]).toUpperCase() === char) {
       count++;
     }
   }
@@ -30,12 +30,22 @@ function decode(plainBytes) {
   }
   return text;
 }
+function frequencies(plainBytes) {
+  var topUsed = "ETAOINSHRDLU",
+  frequencies = {},
+  char = '';
+  for(var i = 0; i < topUsed.length; i++) {
+    char = topUsed[i];
+    frequencies[char] = count(plainBytes, char);
+  }
+  return frequencies;
+}
 var counts = [];
 for (var key = 0; key < 256; key++) {
   var plainBytes = decrypt(cryptBytes, key);
-  var eCount = count(plainBytes, 'E'.charCodeAt());
-  if (eCount > 0) {
-    counts.push({ key: key, e: eCount, plaintext: decode(plainBytes)});
-  }
+  counts.push({ key: key, frequencies: frequencies(plainBytes), plaintext: decode(plainBytes)});
 }
-console.log(counts);
+counts.sort(function (a, b) {
+  return b.frequencies.E - a.frequencies.E;
+});
+console.log(counts.slice(0, 15));
