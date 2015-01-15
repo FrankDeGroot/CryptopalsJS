@@ -1,5 +1,39 @@
-var cryptext = '1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736';
-var cryptBytes = hex2bytes(cryptext);
+var http = require('http');
+
+var options = {
+  hostname: 'cryptopals.com',
+  port: 80,
+  path: '/static/challenge-data/4.txt',
+  method: 'GET'
+};
+
+var req = http.request(options, function(res) {
+  var body = '';
+  res.on('data', function (chunk) {
+    body += chunk;
+  }).on('end', function() {
+    console.log(crack(body));
+  });
+}).on('error', function(e) {
+  console.log('problem with request: ' + e.message);
+}).end();
+
+function crack(body) {
+  var lines = body.split('\n'),
+      cracked = {},
+      candidates = [];
+  for(var i = 0; i < lines.length; i++) {
+    cracked = crackLine(lines[i]);
+    if (cracked.key !== 0) {
+      candidates.push(cracked);
+    }
+  }
+  candidates.sort(function(a, b) {
+    return b.text - a.text;
+  });
+  return candidates[0];
+}
+
 function hex2bytes(cryptext) {
   var bytes = [];
   for(var i = 0; i < cryptext.length; i += 2) {
@@ -49,8 +83,9 @@ function frequencies(plaintext) {
   }
   return frequencies;
 }
-function crack() {
-  var counts = [];
+function crackLine(cryptext) {
+  var cryptBytes = hex2bytes(cryptext),
+      counts = [];
   for (var key = 0; key < 256; key++) {
     var plaintext = decode(decrypt(cryptBytes, key));
     counts.push({ key: key, text: countText(plaintext), frequencies: frequencies(plaintext), plaintext: plaintext});
@@ -58,6 +93,5 @@ function crack() {
   counts.sort(function (a, b) {
     return b.text - a.text;
   });
-  console.log(counts.slice(0, 1));
+  return counts[0];
 }
-crack();
