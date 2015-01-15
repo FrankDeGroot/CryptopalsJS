@@ -40,5 +40,6 @@ function crack(cryptbase64) {
 }
 
 function base642bytes(base64) {
+  var base64Map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
   
 }
