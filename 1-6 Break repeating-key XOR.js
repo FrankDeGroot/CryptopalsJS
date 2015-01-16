@@ -14,32 +14,32 @@ function hamming(string1, string2) {
   }
   return distance;
 }
-console.log(hamming(string1, string2));
-var http = require('http');
 
-var options = {
-  hostname: 'cryptopals.com',
-  port: 80,
-  path: '/static/challenge-data/6.txt',
-  method: 'GET'
-};
+function getFile() {
+  var http = require('http');
 
-var req = http.request(options, function(res) {
-  var body = '';
-  res.on('data', function (chunk) {
-    body += chunk;
-  }).on('end', function() {
-    console.log(crack(body));
-  });
-}).on('error', function(e) {
-  console.log('problem with request: ' + e.message);
-}).end();
+  var options = {
+    hostname: 'cryptopals.com',
+    port: 80,
+    path: '/static/challenge-data/6.txt',
+    method: 'GET'
+  };
+
+  var req = http.request(options, function(res) {
+    var body = '';
+    res.on('data', function (chunk) {
+      body += chunk;
+    }).on('end', function() {
+      console.log(crack(body));
+    });
+  }).on('error', function(e) {
+    console.log('problem with request: ' + e.message);
+  }).end();
+}
 
 function crack(cryptbase64) {
-  var bytes = base642bytes(cryptbase64);
+  var bytes = new Buffer(cryptbase64, 'base64');
+  return bytes;
 }
 
-function base642bytes(base64) {
-  var base64Map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  
-}
+getFile();
