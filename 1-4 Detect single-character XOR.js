@@ -41,6 +41,7 @@ function hex2bytes(cryptext) {
   }
   return bytes;
 }
+
 function decrypt(cryptBytes, key) {
   var plainBytes = [];
   for(var i = 0; i < cryptBytes.length; i++) {
@@ -48,6 +49,7 @@ function decrypt(cryptBytes, key) {
   }
   return plainBytes;
 }
+
 function decode(plainBytes) {
   var plaintext = '';
   for(var i = 0; i < plainBytes.length; i++) {
@@ -55,6 +57,7 @@ function decode(plainBytes) {
   }
   return plaintext;
 }
+
 function countText(plaintext) {
   var count = 0;
   for(var i = 0; i < plaintext.length; i++) {
@@ -64,6 +67,7 @@ function countText(plaintext) {
   }
   return count;
 }
+
 function count(plaintext, char) {
   var count = 0;
   for(var i = 0; i < plaintext.length; i++) {
@@ -73,6 +77,7 @@ function count(plaintext, char) {
   }
   return count;
 }
+
 function frequencies(plaintext) {
   var topUsed = "ETAOINSHRDLU",
   frequencies = {},
@@ -83,6 +88,7 @@ function frequencies(plaintext) {
   }
   return frequencies;
 }
+
 function crackLine(cryptext) {
   var cryptBytes = hex2bytes(cryptext),
       counts = [];
@@ -91,7 +97,11 @@ function crackLine(cryptext) {
     counts.push({ key: key, text: countText(plaintext), frequencies: frequencies(plaintext), plaintext: plaintext});
   }
   counts.sort(function (a, b) {
-    return b.text - a.text;
+    var diff = b.text - a.text;
+    for (var i = 0; i < frequencies.length; i++) {
+      diff = diff || b.frequencies[i] - a.frequencies[i];
+    }
+    return diff;
   });
   return counts[0];
 }
